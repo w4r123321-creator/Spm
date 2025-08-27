@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Chat App</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background: #f0f2f5;
+        margin: 0;
+        padding: 0;
+      }
+      #messages {
+        list-style-type: none;
+        margin: 0;
+        padding: 10px;
+        height: 80vh;
+        overflow-y: scroll;
+        background: #fff;
+      }
+      #messages li {
+        padding: 8px 10px;
+        margin-bottom: 10px;
+        border-radius: 10px;
+        background: #e4e6eb;
+        max-width: 60%;
+      }
+      #messages li.self {
+        background: #0084ff;
+        color: white;
+        margin-left: auto;
+      }
+      #form {
+        display: flex;
+        padding: 10px;
+        background: #ddd;
+      }
+      #input {
+        flex: 1;
+        padding: 10px;
+        border: none;
+        border-radius: 20px;
+        outline: none;
+      }
+      #send {
+        margin-left: 10px;
+        padding: 10px 20px;
+        border: none;
+        background: #0084ff;
+        color: white;
+        border-radius: 20px;
+        cursor: pointer;
+      }
+    </style>
+  </head>
+  <body>
+    <ul id="messages"></ul>
+    <form id="form">
+      <input id="input" autocomplete="off" /><button id="send">Send</button>
+    </form>
+
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+    <script>
+      const socket = io();
+
+      const form = document.getElementById("form");
+      const input = document.getElementById("input");
+      const messages = document.getElementById("messages");
+
+      form.addEventListener("submit", function (e) {
+        e.preventDefault();
+        if (input.value) {
+          socket.emit("chat message", input.value);
+          addMessage(input.value, true);
+          input.value = "";
+        }
+      });
+
+      socket.on("chat message", function (msg) {
+        addMessage(msg, false);
+      });
+
+      function addMessage(msg, self = false) {
+        const li = document.createElement("li");
+        li.textContent = msg;
+        if (self) li.classList.add("self");
+        messages.appendChild(li);
+        messages.scrollTop = messages.scrollHeight;
+      }
+    </script>
+  </body>
+</html>
